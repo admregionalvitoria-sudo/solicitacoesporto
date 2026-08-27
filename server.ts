@@ -237,17 +237,106 @@ class LocalDatabase {
     };
   }
 
-  setAvailableItems(items: any[], updatedBy: string = "Sistema") {
+  setAvailableItems(
+    items: any[],
+    updatedBy: string = "Sistema",
+    mode: 'replace' | 'merge' = 'replace',
+    resolveConflicts: 'check' | 'overwrite' | 'ignore' = 'check'
+  ) {
     this.load();
-    this.data.availableItems = items;
+    const existing = this.data.availableItems || [];
+
+    if (mode === 'replace') {
+      this.data.availableItems = items;
+      this.data.availableItemsMeta = {
+        lastUpdated: new Date().toISOString(),
+        updatedBy,
+        totalSenaiItems: items.length
+      };
+      this.save();
+      return {
+        success: true,
+        count: items.length,
+        meta: this.data.availableItemsMeta,
+        message: `Base zerada e ${items.length} novos itens do SENAI importados!`
+      };
+    }
+
+    // mode === 'merge'
+    const conflicts: any[] = [];
+    const newItems: any[] = [];
+
+    const existingMapByCode = new Map<string, any>();
+    const existingMapByName = new Map<string, any>();
+
+    for (const item of existing) {
+      if (item.codigo) existingMapByCode.set(item.codigo.toString().trim(), item);
+      if (item.full_name) existingMapByName.set(item.full_name.toLowerCase().trim(), item);
+    }
+
+    for (const incoming of items) {
+      const incCode = incoming.codigo ? incoming.codigo.toString().trim() : '';
+      const incName = incoming.full_name ? incoming.full_name.toLowerCase().trim() : '';
+
+      const match = (incCode && existingMapByCode.get(incCode)) || (incName && existingMapByName.get(incName));
+
+      if (match) {
+        conflicts.push({
+          codigo: incoming.codigo || match.codigo,
+          existing: match,
+          incoming
+        });
+      } else {
+        newItems.push(incoming);
+      }
+    }
+
+    if (conflicts.length > 0 && resolveConflicts === 'check') {
+      return {
+        hasConflicts: true,
+        conflicts,
+        newItemsCount: newItems.length,
+        totalCsvItems: items.length,
+        message: `Foram encontrados ${conflicts.length} conflito(s) com itens já existentes.`
+      };
+    }
+
+    let finalItems: any[] = [];
+
+    if (resolveConflicts === 'overwrite') {
+      const conflictCodes = new Set(conflicts.map(c => c.codigo?.toString().trim()));
+      const conflictNames = new Set(conflicts.map(c => c.incoming?.full_name?.toLowerCase().trim()));
+
+      const filteredExisting = existing.filter(ex => {
+        const exCode = ex.codigo ? ex.codigo.toString().trim() : '';
+        const exName = ex.full_name ? ex.full_name.toLowerCase().trim() : '';
+        return !conflictCodes.has(exCode) && !conflictNames.has(exName);
+      });
+
+      finalItems = [...filteredExisting, ...items];
+    } else if (resolveConflicts === 'ignore') {
+      finalItems = [...existing, ...newItems];
+    } else {
+      finalItems = [...existing, ...newItems];
+    }
+
+    this.data.availableItems = finalItems;
     this.data.availableItemsMeta = {
       lastUpdated: new Date().toISOString(),
       updatedBy,
-      totalSenaiItems: items.length
+      totalSenaiItems: finalItems.length
     };
     this.save();
-    return this.data.availableItemsMeta;
+
+    return {
+      success: true,
+      count: finalItems.length,
+      conflictsResolved: conflicts.length,
+      meta: this.data.availableItemsMeta,
+      message: `Itens adicionados/mesclados com sucesso! Total no banco: ${finalItems.length} itens.`
+    };
   }
+
 
 
   private save() {
@@ -2293,6 +2382,9 @@ app.post("/api/purchases/upload-items", authenticate, upload.single('file'), asy
       return res.status(400).json({ error: "Nenhum arquivo CSV foi enviado." });
     }
 
+    const mode = (req.body.mode === 'merge' ? 'merge' : 'replace') as 'replace' | 'merge';
+    const resolveConflicts = (req.body.resolveConflicts || 'check') as 'check' | 'overwrite' | 'ignore';
+
     // Parse CSV filtering ONLY SENAI items
     const senaiItems = parseSenaiItemsFromCSV(req.file.buffer);
 
@@ -2302,19 +2394,36 @@ app.post("/api/purchases/upload-items", authenticate, upload.single('file'), asy
       });
     }
 
-    const meta = localDb.setAvailableItems(senaiItems, user.name || user.email);
+    const result = localDb.setAvailableItems(
+      senaiItems,
+      user.name || user.email,
+      mode,
+      resolveConflicts
+    );
+
+    if (result.hasConflicts) {
+      return res.json({
+        success: false,
+        hasConflicts: true,
+        conflicts: result.conflicts,
+        newItemsCount: result.newItemsCount,
+        totalCsvItems: result.totalCsvItems,
+        message: result.message
+      });
+    }
 
     res.json({
       success: true,
-      count: senaiItems.length,
-      meta,
-      message: `Upload concluído com sucesso! ${senaiItems.length} itens do SENAI importados.`
+      count: result.count,
+      meta: result.meta,
+      message: result.message
     });
   } catch (error: any) {
     console.error("Erro no upload do CSV de itens:", error);
     res.status(500).json({ error: error.message || "Erro ao processar arquivo CSV" });
   }
 });
+
 
 app.get("/api/purchases/reasons", async (req, res) => {
   res.json([
