@@ -1,0 +1,191 @@
+[
+  {
+    "line": 1,
+    "cols": 12,
+    "parts": [
+      "LISTA DE ITENS VIGENTES EM ATAS E CONTRATOS - ATT 12/08/2026\"",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "line": 2,
+    "cols": 13,
+    "parts": [
+      "",
+      "COD. PRODUTO FLUIG",
+      "CONTRATO",
+      "ENTIDADE",
+      "STATUSCONTRATO",
+      "FORNECEDOR",
+      "DATA INICIO",
+      "DATA FIM",
+      "IDPRD RM",
+      "NOME FANTASIA",
+      "DESC. PRODUTO",
+      "R$ TOTAL CONTRATO",
+      "CNPJ"
+    ]
+  },
+  {
+    "line": 3,
+    "cols": 13,
+    "parts": [
+      "",
+      "008666",
+      "2026.0261",
+      "SESI-DR/ES",
+      "VIGENTE",
+      "INSTITUTO EUVALDO LODI - IEL/ES",
+      "04/08/2026",
+      "04/08/2027",
+      "8666",
+      "SERVIÇOS TÉCNICOS ESPECIALIZADOS",
+      "SERVIÇOS TÉCNICOS ESPECIALIZADOS",
+      "10.704,00",
+      "28.164.937/0001-11"
+    ]
+  },
+  {
+    "line": 4,
+    "cols": 13,
+    "parts": [
+      "",
+      "006850",
+      "2026.0171",
+      "FINDES",
+      "VIGENTE",
+      "DELOITTE TOUCHE TOHMATSU CONSULTORES LTDA.",
+      "04/08/2026",
+      "04/08/2027",
+      "6933",
+      "ASSESSORIA E CONSULTORIA EM INOVAÇÃO",
+      "ASSESSORIA E CONSULTORIA EM INOVAÇÃO",
+      "90.000,00",
+      "02.189.924/0001-03"
+    ]
+  },
+  {
+    "line": 5,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "CONEF",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  },
+  {
+    "line": 6,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "CINDES",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  },
+  {
+    "line": 7,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "IEL/ES",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  },
+  {
+    "line": 8,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "SENAI-DR/ES",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  },
+  {
+    "line": 9,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "FINDES",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  },
+  {
+    "line": 10,
+    "cols": 13,
+    "parts": [
+      "",
+      "001151",
+      "2026.0245",
+      "SESI-DR/ES",
+      "VIGENTE",
+      "UBER DO BRASIL TECNOLOGIA LTDA.",
+      "03/08/2026",
+      "03/08/2027",
+      "1235",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "TRANSPORTE DE PASSAGEIRO COM MOTORISTA, COMPLEMENTO: SERVICOS",
+      "633.500,00",
+      "17.895.646/0001-87"
+    ]
+  }
+]
