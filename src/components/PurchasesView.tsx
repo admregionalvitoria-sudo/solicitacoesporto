@@ -89,10 +89,13 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; b
 
 export const ComprasHomeView: React.FC<PurchasesProps> = ({
   user,
+  token,
   onNavigate,
+  showMessage
 }) => {
   const canRequest = hasModuleAccess(user, 'compras_solicitar');
   const canAttend = hasModuleAccess(user, 'compras_atender');
+  const [showCsvModal, setShowCsvModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -132,7 +135,7 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
 
         {/* Informative Banner on Segregation of Duties */}
         {user && (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto space-y-3">
             {canRequest && !canAttend ? (
               <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-start gap-3 text-left">
                 <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl mt-0.5 shrink-0">
@@ -145,17 +148,25 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
                   </p>
                 </div>
               </div>
-            ) : canAttend && !canRequest ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3 text-left">
-                <div className="p-2 bg-emerald-100 text-emerald-700 rounded-xl mt-0.5 shrink-0">
-                  <ShoppingCart className="w-4 h-4" />
+            ) : canAttend || user.role === 'admin' ? (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-emerald-100 text-emerald-700 rounded-xl mt-0.5 shrink-0">
+                    <ShoppingCart className="w-4 h-4" />
+                  </div>
+                  <div className="text-xs text-emerald-950 space-y-0.5">
+                    <p className="font-bold text-sm">Perfil: Comprador / Administrador</p>
+                    <p className="text-emerald-800 leading-relaxed">
+                      Você pode atender pedidos, gerenciar a cotação e fazer o <strong>upload da planilha de itens do SENAI (CSV)</strong>.
+                    </p>
+                  </div>
                 </div>
-                <div className="text-xs text-emerald-950 space-y-0.5">
-                  <p className="font-bold text-sm">Perfil: Comprador (Atendimento & Aprovação)</p>
-                  <p className="text-emerald-800 leading-relaxed">
-                    Você é responsável por <strong>atender os pedidos</strong> solicitados pelos supervisores, vincular número de Fluig, gerenciar status e emitir aprovações/informativos.
-                  </p>
-                </div>
+                <Button
+                  onClick={() => setShowCsvModal(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3.5 shrink-0 rounded-xl flex items-center gap-1.5 shadow-sm"
+                >
+                  <Upload className="w-4 h-4" /> Upload CSV
+                </Button>
               </div>
             ) : (
               <div className="p-3.5 bg-slate-100/90 border border-slate-200 rounded-2xl flex items-center justify-between text-xs text-slate-700 text-left">
@@ -165,6 +176,7 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
             )}
           </div>
         )}
+
 
         {/* Action Cards */}
         {!user ? (
@@ -269,8 +281,21 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
           </Button>
         </div>
       </motion.div>
+
+      {/* Modal Upload CSV de Itens */}
+      <AnimatePresence>
+        {showCsvModal && (
+          <BuyerCsvModal
+            user={user}
+            token={token}
+            onClose={() => setShowCsvModal(false)}
+            showMessage={showMessage}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
+
 };
 
 // =====================================================================
@@ -1089,15 +1114,26 @@ export const PurchaseTrackingView: React.FC<PurchasesProps> = ({
 
           <div className="flex items-center gap-2 flex-wrap">
             {(canAttend || user?.role === 'admin') && (
-              <Button
-                variant="outline"
-                onClick={handleTestEmail}
-                disabled={testingEmail}
-                className="text-xs font-bold py-2 px-3 h-auto text-green-800 border-green-300 hover:bg-green-50"
-              >
-                <Mail className={cn("w-3.5 h-3.5", testingEmail && "animate-pulse")} />
-                {testingEmail ? 'Testando...' : 'Testar E-mails Compradores'}
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCsvModal(true)}
+                  className="text-xs font-bold py-2 px-3.5 h-auto text-blue-800 border-blue-300 bg-blue-50/70 hover:bg-blue-100 flex items-center gap-1.5 shadow-sm"
+                >
+                  <Upload className="w-3.5 h-3.5 text-blue-600" />
+                  Upload CSV (Itens SENAI)
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={handleTestEmail}
+                  disabled={testingEmail}
+                  className="text-xs font-bold py-2 px-3 h-auto text-green-800 border-green-300 hover:bg-green-50"
+                >
+                  <Mail className={cn("w-3.5 h-3.5", testingEmail && "animate-pulse")} />
+                  {testingEmail ? 'Testando...' : 'Testar E-mails Compradores'}
+                </Button>
+              </>
             )}
 
             <Button
@@ -1107,6 +1143,7 @@ export const PurchaseTrackingView: React.FC<PurchasesProps> = ({
             >
               <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} /> Atualizar
             </Button>
+
 
             {canRequest && (
               <Button
