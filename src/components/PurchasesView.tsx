@@ -254,7 +254,7 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
                 </div>
                 <div className="space-y-1 text-center">
                   <h2 className="text-xl font-bold text-slate-900">
-                    {canAttend ? 'Painel de Atendimento' : 'Acompanhar Minhas Compras'}
+                    Acompanhamento de Compra
                   </h2>
                   <p className="text-sm text-slate-500">
                     {canAttend
@@ -264,7 +264,7 @@ export const ComprasHomeView: React.FC<PurchasesProps> = ({
                 </div>
               </div>
               <div className={cn("mt-4 flex items-center font-bold text-sm gap-1", canAttend ? "text-emerald-700" : "text-indigo-700")}>
-                <span>{canAttend ? 'Acessar Fila de Atendimento' : 'Ver Meus Pedidos'}</span>
+                <span>{canAttend ? 'Acessar Acompanhamento de Compra' : 'Ver Meus Pedidos'}</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </motion.button>
