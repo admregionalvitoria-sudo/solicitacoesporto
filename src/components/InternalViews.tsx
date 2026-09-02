@@ -1392,7 +1392,7 @@ export const UsersView = ({
                         type="password"
                         placeholder="Confirme a nova senha"
                         value={confirmPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                       />
                     </div>
