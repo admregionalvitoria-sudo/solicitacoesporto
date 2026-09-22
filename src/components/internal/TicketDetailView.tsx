@@ -52,7 +52,7 @@ export const TicketDetailView: React.FC<TicketDetailViewProps> = ({
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl">
-                    #{selectedTicket.numeric_id || String(selectedTicket.id).substring(0, 4)}
+                    #{selectedTicket.numeric_id || selectedTicket.id}
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">{selectedTicket.equipment}</h2>

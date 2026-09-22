@@ -189,7 +189,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="p-5 flex flex-col md:flex-row md:items-center gap-6">
                       <div className="flex items-center gap-4 min-w-[120px]">
                         <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center font-bold text-slate-600 border border-slate-100">
-                          #{ticket.numeric_id || String(ticket.id).substring(0, 4)}
+                          #{ticket.numeric_id || ticket.id}
                         </div>
                         <div className={cn("w-3 h-3 rounded-full", STATUS_COLORS[ticket.status])} />
                       </div>

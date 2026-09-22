@@ -82,18 +82,40 @@ router.post("/tickets", async (req, res) => {
 
   try {
     const counterRef = doc(db, "counters", "tickets");
-    let numeric_id = 1;
+    let numeric_id = 20;
 
-    await runTransaction(db, async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
-      if (!counterDoc.exists()) {
-        transaction.set(counterRef, { current: 1 });
-        numeric_id = 1;
-      } else {
-        numeric_id = counterDoc.data().current + 1;
-        transaction.update(counterRef, { current: numeric_id });
+    try {
+      await runTransaction(db, async (transaction) => {
+        const counterDoc = await transaction.get(counterRef);
+        if (!counterDoc.exists()) {
+          numeric_id = 20;
+          transaction.set(counterRef, { current: 20 });
+        } else {
+          const currentCount = counterDoc.data()?.current;
+          if (typeof currentCount === 'number' && currentCount >= 19) {
+            numeric_id = currentCount + 1;
+          } else {
+            numeric_id = 20;
+          }
+          transaction.update(counterRef, { current: numeric_id });
+        }
+      });
+    } catch (txError) {
+      console.error("⚠️ Transação de contador falhou, calculando numeric_id máximo existente:", txError);
+      try {
+        const snap = await getDocs(collection(db, "tickets"));
+        let maxId = 19;
+        snap.docs.forEach(docSnap => {
+          const data = docSnap.data();
+          if (data && typeof data.numeric_id === 'number' && data.numeric_id > maxId) {
+            maxId = data.numeric_id;
+          }
+        });
+        numeric_id = maxId + 1;
+      } catch (fallbackError) {
+        numeric_id = 20;
       }
-    });
+    }
 
     const fullTicket = {
       numeric_id,
@@ -237,10 +259,21 @@ router.get("/tickets/:id", authenticate, async (req, res) => {
   if (!db) return res.status(500).json({ error: "Banco de dados não inicializado" });
 
   try {
-    const docRef = doc(db, "tickets", req.params.id);
-    const snap = await getDoc(docRef);
-    if (!snap.exists()) return res.status(404).json({ error: "Chamado não encontrado" });
-    res.json({ id: snap.id, ...snap.data() });
+    let ticketSnap;
+    if (!isNaN(Number(req.params.id))) {
+      const q = query(collection(db, "tickets"), where("numeric_id", "==", Number(req.params.id)));
+      const qSnap = await getDocs(q);
+      if (!qSnap.empty) ticketSnap = qSnap.docs[0];
+    }
+
+    if (!ticketSnap) {
+      const docRef = doc(db, "tickets", req.params.id);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) ticketSnap = snap;
+    }
+
+    if (!ticketSnap) return res.status(404).json({ error: "Chamado não encontrado" });
+    res.json({ id: ticketSnap.id, ...ticketSnap.data() });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

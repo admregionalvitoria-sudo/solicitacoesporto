@@ -277,7 +277,10 @@ export class LocalDatabase {
   addTicket(ticket: any) {
     this.load();
     const id = "ticket_" + Math.random().toString(36).substring(2, 11);
-    this.data.counters.tickets = (this.data.counters.tickets || 0) + 1;
+    if (!this.data.counters.tickets || this.data.counters.tickets < 19) {
+      this.data.counters.tickets = 19;
+    }
+    this.data.counters.tickets += 1;
     const numeric_id = this.data.counters.tickets;
     const newTicket = { id, numeric_id, ...ticket };
     this.data.tickets.push(newTicket);
