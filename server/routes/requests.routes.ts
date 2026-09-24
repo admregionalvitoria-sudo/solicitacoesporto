@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, isDummyFirebase, localDb, collection, getDocs, getDoc, addDoc, doc, updateDoc, deleteDoc, query, where, runTransaction } from "../config/firebase.js";
 import { authenticate, isAdmin } from "../middleware/auth.js";
-import { notifyNewTicket, notifyTicketUpdateToRequester } from "../services/emailService.js";
+import { notifyNewTicket, notifyRequesterTicketOpened, notifyTicketUpdateToRequester } from "../services/emailService.js";
 
 const router = Router();
 
@@ -69,8 +69,8 @@ router.post("/tickets", async (req, res) => {
       const ticket = localDb.addTicket(newTicketData);
       
       // Disparar notificações por e-mail (Assíncrono)
-      notifyNewTicket(ticket);
-      notifyTicketUpdateToRequester(ticket, { type: 'status', newVal: 'aberto' });
+      notifyNewTicket(ticket);              // → dluiz@findes.org.br
+      notifyRequesterTicketOpened(ticket);  // → solicitante (confirmação de abertura)
 
       return res.json(ticket);
     } catch (error: any) {
@@ -126,8 +126,8 @@ router.post("/tickets", async (req, res) => {
     const createdTicket = { id: docRef.id, ...fullTicket };
 
     // Disparar notificações por e-mail (Assíncrono)
-    notifyNewTicket(createdTicket);
-    notifyTicketUpdateToRequester(createdTicket, { type: 'status', newVal: 'aberto' });
+    notifyNewTicket(createdTicket);              // → dluiz@findes.org.br
+    notifyRequesterTicketOpened(createdTicket);  // → solicitante (confirmação de abertura)
 
     res.json(createdTicket);
   } catch (error: any) {
@@ -466,7 +466,7 @@ router.post("/tickets/:id/comments", authenticate, async (req, res) => {
     const comment = localDb.addComment(commentData);
     const ticket = localDb.getTicket(req.params.id);
     if (ticket && !is_internal) {
-      notifyTicketUpdateToRequester(ticket, { type: 'comment', commentText: commentText, authorName: user.name });
+      notifyTicketUpdateToRequester(ticket, { type: 'comment', commentText: commentText, authorName: user.name, isInternal: false });
     }
     return res.json(comment);
   }
@@ -480,7 +480,7 @@ router.post("/tickets/:id/comments", authenticate, async (req, res) => {
     const ticketSnap = await getDoc(doc(db, "tickets", req.params.id));
     if (ticketSnap.exists() && !is_internal) {
       const ticket: any = { id: ticketSnap.id, ...ticketSnap.data() };
-      notifyTicketUpdateToRequester(ticket, { type: 'comment', commentText: commentText, authorName: user.name });
+      notifyTicketUpdateToRequester(ticket, { type: 'comment', commentText: commentText, authorName: user.name, isInternal: false });
     }
 
     res.json(comment);
