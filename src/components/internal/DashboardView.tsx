@@ -62,7 +62,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
     const matchesPriority = filterPriority === 'all' || t.priority === filterPriority;
     const matchesStatus = filterStatus === 'all' ? t.status !== 'concluido' : t.status === filterStatus;
-    const matchesUnit = t.unit === selectedUnit;
+    const matchesUnit =
+      t.unit === selectedUnit ||
+      t.department === selectedUnit ||
+      !t.unit; // chamados sem unidade definida sempre aparecem
+
 
     const matchesCategory =
       filterCategory === 'all'
