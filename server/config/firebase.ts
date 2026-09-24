@@ -427,13 +427,34 @@ try {
   if (fs.existsSync(configPath)) {
     firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf-8"));
   } else {
+    // VITE_* vars are build-time only on Vercel frontend; server needs FIREBASE_* (no prefix) at runtime.
+    // We support both: VITE_* (local dev) and FIREBASE_* (Vercel server-side runtime).
     firebaseConfig = {
-      apiKey: process.env.VITE_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.VITE_FIREBASE_APP_ID || process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+      apiKey:
+        process.env.FIREBASE_API_KEY ||
+        process.env.VITE_FIREBASE_API_KEY ||
+        process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain:
+        process.env.FIREBASE_AUTH_DOMAIN ||
+        process.env.VITE_FIREBASE_AUTH_DOMAIN ||
+        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId:
+        process.env.FIREBASE_PROJECT_ID ||
+        process.env.VITE_FIREBASE_PROJECT_ID ||
+        process.env.NEXT_PUBLIC_FIREBASE_PROJECT ||
+        process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket:
+        process.env.FIREBASE_STORAGE_BUCKET ||
+        process.env.VITE_FIREBASE_STORAGE_BUCKET ||
+        process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId:
+        process.env.FIREBASE_MESSAGING_SENDER_ID ||
+        process.env.VITE_FIREBASE_MESSAGING_SENDER_ID ||
+        process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId:
+        process.env.FIREBASE_APP_ID ||
+        process.env.VITE_FIREBASE_APP_ID ||
+        process.env.NEXT_PUBLIC_FIREBASE_APP_ID
     };
   }
 } catch (e) {
@@ -451,7 +472,10 @@ let dbInstance: any;
 try {
   if (firebaseConfig.projectId && !isDummyFirebase) {
     const firebaseApp = initializeApp(firebaseConfig);
-    dbInstance = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+    // Do NOT pass firestoreDatabaseId if it's undefined — always use the default database
+    dbInstance = firebaseConfig.firestoreDatabaseId
+      ? getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId)
+      : getFirestore(firebaseApp);
     console.log("Firebase initialized for project:", firebaseConfig.projectId);
   } else {
     console.warn("Firebase Project ID is missing or is dummy. Local Database fallback enabled.");
